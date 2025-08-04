@@ -12,7 +12,17 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: example
     volumes:
       - mongodb_data:/data/db
+    command: mongod --replSet rs0 --bind_ip_all  
 
+  mongodb-setup:
+    image: mongo:latest
+    depends_on:
+      - mongodb
+    restart: on-failure
+    command: >
+      bash -c "sleep 10 && 
+      mongosh --host mongodb --username root --password example --eval 'rs.initiate()'"
+      
   # Mongo Express (Web UI for MongoDB)
   mongo-express:
     image: mongo-express:latest
